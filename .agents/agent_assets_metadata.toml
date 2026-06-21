@@ -1,0 +1,8 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "NV_HeCRS39IhtJhGLVPCY"
+uri = "file://artifacts/mainalasri-pro/assets/images/icon.png"
+type = "image"
+title = "generated_image"
