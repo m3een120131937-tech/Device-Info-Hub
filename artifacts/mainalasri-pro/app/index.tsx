@@ -206,8 +206,8 @@ function InfoItem({
 const infoStyles = StyleSheet.create({
   wrap: { width: "48%", alignItems: "center", paddingVertical: 14 },
   iconWrap: { width: 44, height: 44, borderRadius: 22, alignItems: "center", justifyContent: "center", marginBottom: 8 },
-  label: { fontSize: 11, fontFamily: "Inter_400Regular", marginBottom: 4, textAlign: "center" },
-  value: { fontSize: 13, fontFamily: "Inter_600SemiBold", textAlign: "center" },
+  label: { fontSize: 11, marginBottom: 4, textAlign: "center" },
+  value: { fontSize: 13, fontWeight: "600", textAlign: "center" },
 });
 
 /* ─── ToolCard ─────────────────────────────── */
@@ -246,7 +246,7 @@ const cardStyles = StyleSheet.create({
   pressable: { width: "47%" },
   card: { borderRadius: 18, borderWidth: 1, padding: 18, alignItems: "center", gap: 10 },
   iconCircle: { width: 64, height: 64, borderRadius: 32, alignItems: "center", justifyContent: "center" },
-  label: { fontSize: 14, fontFamily: "Inter_600SemiBold", textAlign: "center" },
+  label: { fontSize: 14, fontWeight: "600", textAlign: "center" },
   pill: { width: 26, height: 26, borderRadius: 13, alignItems: "center", justifyContent: "center" },
 });
 
@@ -256,16 +256,16 @@ const styles = StyleSheet.create({
   scroll: { paddingHorizontal: 20 },
   headerRow: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", gap: 12, marginBottom: 22 },
   logoCircle: { width: 54, height: 54, borderRadius: 27, alignItems: "center", justifyContent: "center", borderWidth: 1 },
-  appTitle: { fontSize: 26, fontFamily: "Inter_700Bold", textAlign: "right" },
-  appSubtitle: { fontSize: 13, fontFamily: "Inter_400Regular", textAlign: "right", marginTop: 3 },
+  appTitle: { fontSize: 26, fontWeight: "bold", textAlign: "right" },
+  appSubtitle: { fontSize: 13, textAlign: "right", marginTop: 3 },
   infoCard: { borderRadius: 20, borderWidth: 1, padding: 16, marginBottom: 26 },
   infoCardHeader: { flexDirection: "row-reverse", alignItems: "center", gap: 8, marginBottom: 12, paddingBottom: 12, borderBottomWidth: 1 },
-  infoCardTitle: { flex: 1, fontSize: 15, fontFamily: "Inter_600SemiBold", textAlign: "right" },
+  infoCardTitle: { flex: 1, fontSize: 15, fontWeight: "600", textAlign: "right" },
   dot: { width: 8, height: 8, borderRadius: 4 },
   infoGrid: { flexDirection: "row-reverse", flexWrap: "wrap", justifyContent: "space-between" },
-  sectionTitle: { fontSize: 18, fontFamily: "Inter_700Bold", textAlign: "right", marginBottom: 14 },
+  sectionTitle: { fontSize: 18, fontWeight: "bold", textAlign: "right", marginBottom: 14 },
   toolsGrid: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 12, marginBottom: 36 },
   footer: { alignItems: "center", gap: 4 },
-  footerText: { fontSize: 12, fontFamily: "Inter_500Medium" },
-  footerSub: { fontSize: 11, fontFamily: "Inter_400Regular", textAlign: "center" },
+  footerText: { fontSize: 12, fontWeight: "500" },
+  footerSub: { fontSize: 11, textAlign: "center" },
 });

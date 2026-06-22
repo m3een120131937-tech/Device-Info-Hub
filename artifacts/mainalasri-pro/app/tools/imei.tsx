@@ -107,7 +107,7 @@ export default function IMEIScreen() {
           <View style={{ flex: 1 }}>
             <Text style={[styles.imeiTitle, { color: "#00d4ff" }]}>للحصول على IMEI</Text>
             <Text style={[styles.imeiDesc, { color: colors.mutedForeground }]}>
-              اتصل بـ <Text style={{ fontFamily: "Inter_700Bold", color: "#00d4ff" }}>*#06#</Text> من تطبيق الهاتف أو انظر في الإعدادات ← حول الهاتف
+              اتصل بـ <Text style={{ fontWeight: "bold", color: "#00d4ff" }}>*#06#</Text> من تطبيق الهاتف أو انظر في الإعدادات ← حول الهاتف
             </Text>
           </View>
         </View>
@@ -155,20 +155,20 @@ const styles = StyleSheet.create({
   backBtn: { padding: 4 },
   headerTitle: { flexDirection: "row-reverse", alignItems: "center", gap: 10, flex: 1 },
   headerIcon: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
-  titleText: { fontSize: 18, fontFamily: "Inter_700Bold", textAlign: "right" },
-  subtitleText: { fontSize: 12, fontFamily: "Inter_400Regular", textAlign: "right" },
+  titleText: { fontSize: 18, fontWeight: "bold", textAlign: "right" },
+  subtitleText: { fontSize: 12, textAlign: "right" },
   scroll: { padding: 16, gap: 10 },
   imeiBox: { flexDirection: "row-reverse", alignItems: "flex-start", gap: 10, padding: 14, borderRadius: 14, borderWidth: 1 },
-  imeiTitle: { fontSize: 14, fontFamily: "Inter_700Bold", textAlign: "right" },
-  imeiDesc: { fontSize: 13, fontFamily: "Inter_400Regular", textAlign: "right", marginTop: 2, lineHeight: 20 },
-  sectionLabel: { fontSize: 12, fontFamily: "Inter_600SemiBold", textAlign: "right", marginTop: 8, marginBottom: 4 },
+  imeiTitle: { fontSize: 14, fontWeight: "bold", textAlign: "right" },
+  imeiDesc: { fontSize: 13, textAlign: "right", marginTop: 2, lineHeight: 20 },
+  sectionLabel: { fontSize: 12, fontWeight: "600", textAlign: "right", marginTop: 8, marginBottom: 4 },
   infoCard: { borderRadius: 14, borderWidth: 1, overflow: "hidden" },
   infoRow: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 14, paddingVertical: 12 },
   infoLabelRow: { flexDirection: "row-reverse", alignItems: "center", gap: 5 },
-  infoLabel: { fontSize: 13, fontFamily: "Inter_400Regular" },
-  infoValue: { fontSize: 14, fontFamily: "Inter_600SemiBold", textAlign: "left" },
+  infoLabel: { fontSize: 13 },
+  infoValue: { fontSize: 14, fontWeight: "600", textAlign: "left" },
   codeCard: { flexDirection: "row-reverse", alignItems: "center", justifyContent: "space-between", padding: 14, borderRadius: 14, borderWidth: 1 },
   codeRow: { flex: 1, gap: 3 },
-  codeText: { fontSize: 16, fontFamily: "Inter_700Bold", textAlign: "right" },
-  codeDesc: { fontSize: 12, fontFamily: "Inter_400Regular", textAlign: "right" },
+  codeText: { fontSize: 16, fontWeight: "bold", textAlign: "right" },
+  codeDesc: { fontSize: 12, textAlign: "right" },
 });

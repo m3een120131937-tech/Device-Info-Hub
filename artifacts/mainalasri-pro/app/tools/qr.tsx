@@ -90,7 +90,7 @@ export default function QRScreen() {
               </View>
               <Text style={[styles.scanTitle, { color: colors.foreground }]}>مسح QR بالكاميرا</Text>
               <Text style={[styles.scanDesc, { color: colors.mutedForeground }]}>
-                افتح التطبيق عبر <Text style={{ color: "#a855f7", fontFamily: "Inter_700Bold" }}>Expo Go</Text> على هاتفك{"\n"}
+                افتح التطبيق عبر <Text style={{ color: "#a855f7", fontWeight: "bold" }}>Expo Go</Text> على هاتفك{"\n"}
                 واضغط الزر أدناه للمسح بالكاميرا الحقيقية
               </Text>
               <Pressable
@@ -177,11 +177,11 @@ const styles = StyleSheet.create({
   backBtn: { padding: 4 },
   headerTitle: { flexDirection: "row-reverse", alignItems: "center", gap: 10, flex: 1 },
   headerIcon: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
-  titleText: { fontSize: 18, fontFamily: "Inter_700Bold", textAlign: "right" },
-  subtitleText: { fontSize: 12, fontFamily: "Inter_400Regular", textAlign: "right" },
+  titleText: { fontSize: 18, fontWeight: "bold", textAlign: "right" },
+  subtitleText: { fontSize: 12, textAlign: "right" },
   tabBar: { flexDirection: "row-reverse", borderBottomWidth: 1 },
   tab: { flex: 1, paddingVertical: 12, alignItems: "center", borderBottomWidth: 2, borderBottomColor: "transparent" },
-  tabText: { fontSize: 14, fontFamily: "Inter_600SemiBold" },
+  tabText: { fontSize: 14, fontWeight: "600" },
   scroll: { padding: 16, gap: 12 },
   scanBox: { borderRadius: 18, borderWidth: 1, padding: 24, alignItems: "center", gap: 14 },
   qrFrame: { width: 160, height: 160, borderRadius: 12, borderWidth: 2, alignItems: "center", justifyContent: "center", position: "relative" },
@@ -190,21 +190,21 @@ const styles = StyleSheet.create({
   cornerTR: { top: -2, right: -2, borderTopWidth: 3, borderRightWidth: 3, borderRadius: 3 },
   cornerBL: { bottom: -2, left: -2, borderBottomWidth: 3, borderLeftWidth: 3, borderRadius: 3 },
   cornerBR: { bottom: -2, right: -2, borderBottomWidth: 3, borderRightWidth: 3, borderRadius: 3 },
-  scanTitle: { fontSize: 17, fontFamily: "Inter_700Bold", textAlign: "center" },
-  scanDesc: { fontSize: 13, fontFamily: "Inter_400Regular", textAlign: "center", lineHeight: 20, color: "#888" },
+  scanTitle: { fontSize: 17, fontWeight: "bold", textAlign: "center" },
+  scanDesc: { fontSize: 13, textAlign: "center", lineHeight: 20, color: "#888" },
   scanBtn: { flexDirection: "row", alignItems: "center", gap: 8, paddingVertical: 12, paddingHorizontal: 28, borderRadius: 30 },
-  scanBtnText: { color: "#fff", fontSize: 15, fontFamily: "Inter_600SemiBold" },
-  sectionLabel: { fontSize: 12, fontFamily: "Inter_600SemiBold", textAlign: "right", marginTop: 4, marginBottom: 2 },
+  scanBtnText: { color: "#fff", fontSize: 15, fontWeight: "600" },
+  sectionLabel: { fontSize: 12, fontWeight: "600", textAlign: "right", marginTop: 4, marginBottom: 2 },
   typesGrid: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 10 },
   typeCard: { width: "30%", borderRadius: 12, borderWidth: 1, padding: 12, alignItems: "center", gap: 6 },
-  typeName: { fontSize: 11, fontFamily: "Inter_500Medium", textAlign: "center" },
+  typeName: { fontSize: 11, fontWeight: "500", textAlign: "center" },
   generateCard: { borderRadius: 18, borderWidth: 1, padding: 18, gap: 12 },
-  genLabel: { fontSize: 14, fontFamily: "Inter_600SemiBold", textAlign: "right" },
-  genInput: { borderRadius: 12, borderWidth: 1, padding: 12, minHeight: 80, fontSize: 14, fontFamily: "Inter_400Regular" },
+  genLabel: { fontSize: 14, fontWeight: "600", textAlign: "right" },
+  genInput: { borderRadius: 12, borderWidth: 1, padding: 12, minHeight: 80, fontSize: 14 },
   genBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 13, borderRadius: 14 },
-  genBtnText: { color: "#fff", fontSize: 15, fontFamily: "Inter_600SemiBold" },
+  genBtnText: { color: "#fff", fontSize: 15, fontWeight: "600" },
   exCard: { flexDirection: "row-reverse", alignItems: "center", gap: 12, padding: 13, borderRadius: 14, borderWidth: 1 },
   exIcon: { width: 36, height: 36, borderRadius: 18, alignItems: "center", justifyContent: "center" },
-  exName: { fontSize: 14, fontFamily: "Inter_600SemiBold", textAlign: "right" },
-  exValue: { fontSize: 12, fontFamily: "Inter_400Regular", textAlign: "right", marginTop: 1 },
+  exName: { fontSize: 14, fontWeight: "600", textAlign: "right" },
+  exValue: { fontSize: 12, textAlign: "right", marginTop: 1 },
 });

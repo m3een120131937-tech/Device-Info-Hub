@@ -111,7 +111,7 @@ export default function NetworkScreen() {
               <MaterialCommunityIcons name="wifi-off" size={32} color={colors.mutedForeground} />
               <Text style={[styles.errorText, { color: colors.mutedForeground }]}>تعذّر تحميل معلومات الشبكة</Text>
               <Pressable onPress={fetchNetworkInfo} style={[styles.retryBtn, { backgroundColor: "#4ade8030" }]}>
-                <Text style={{ color: "#4ade80", fontFamily: "Inter_600SemiBold" }}>إعادة المحاولة</Text>
+                <Text style={{ color: "#4ade80", fontWeight: "600" }}>إعادة المحاولة</Text>
               </Pressable>
             </View>
           ) : (
@@ -177,26 +177,26 @@ const styles = StyleSheet.create({
   backBtn: { padding: 4 },
   headerTitle: { flexDirection: "row-reverse", alignItems: "center", gap: 10, flex: 1 },
   headerIcon: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
-  titleText: { fontSize: 18, fontFamily: "Inter_700Bold", textAlign: "right" },
-  subtitleText: { fontSize: 12, fontFamily: "Inter_400Regular", textAlign: "right" },
+  titleText: { fontSize: 18, fontWeight: "bold", textAlign: "right" },
+  subtitleText: { fontSize: 12, textAlign: "right" },
   refreshBtn: { width: 36, height: 36, borderRadius: 18, alignItems: "center", justifyContent: "center" },
   scroll: { padding: 16, gap: 10 },
   ipCard: { borderRadius: 18, borderWidth: 1, padding: 24, alignItems: "center", gap: 6 },
-  ipLabel: { fontSize: 12, fontFamily: "Inter_500Medium" },
-  ipValue: { fontSize: 26, fontFamily: "Inter_700Bold" },
+  ipLabel: { fontSize: 12, fontWeight: "500" },
+  ipValue: { fontSize: 26, fontWeight: "bold" },
   pingRow: { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 4 },
-  pingText: { fontSize: 12, fontFamily: "Inter_400Regular" },
+  pingText: { fontSize: 12 },
   errorBox: { alignItems: "center", gap: 10, paddingVertical: 8 },
-  errorText: { fontSize: 14, fontFamily: "Inter_400Regular" },
+  errorText: { fontSize: 14 },
   retryBtn: { paddingHorizontal: 20, paddingVertical: 8, borderRadius: 20, marginTop: 4 },
-  sectionLabel: { fontSize: 12, fontFamily: "Inter_600SemiBold", textAlign: "right", marginTop: 8, marginBottom: 4 },
+  sectionLabel: { fontSize: 12, fontWeight: "600", textAlign: "right", marginTop: 8, marginBottom: 4 },
   detailsCard: { borderRadius: 14, borderWidth: 1, overflow: "hidden" },
   detailRow: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 14, paddingVertical: 12 },
   detailLabelRow: { flexDirection: "row-reverse", alignItems: "center", gap: 5 },
-  detailLabel: { fontSize: 13, fontFamily: "Inter_400Regular" },
-  detailValue: { fontSize: 13, fontFamily: "Inter_600SemiBold", maxWidth: "55%" },
+  detailLabel: { fontSize: 13 },
+  detailValue: { fontSize: 13, fontWeight: "600", maxWidth: "55%" },
   dnsCard: { flexDirection: "row-reverse", alignItems: "center", gap: 12, padding: 14, borderRadius: 14, borderWidth: 1 },
   dnsIcon: { width: 38, height: 38, borderRadius: 19, alignItems: "center", justifyContent: "center" },
-  dnsName: { fontSize: 14, fontFamily: "Inter_600SemiBold", textAlign: "right" },
-  dnsIps: { fontSize: 12, fontFamily: "Inter_400Regular", textAlign: "right", marginTop: 2 },
+  dnsName: { fontSize: 14, fontWeight: "600", textAlign: "right" },
+  dnsIps: { fontSize: 12, textAlign: "right", marginTop: 2 },
 });
