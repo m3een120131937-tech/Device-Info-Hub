@@ -47,11 +47,10 @@ const styles = StyleSheet.create({
     zIndex: 9999,
     minWidth: 200,
     maxWidth: 320,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 8,
+    ...Platform.select({
+      web: { boxShadow: "0px 4px 24px rgba(0,0,0,0.4)" },
+      default: { shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.4, shadowRadius: 12, elevation: 8 },
+    }),
   },
   text: {
     fontSize: 14,
