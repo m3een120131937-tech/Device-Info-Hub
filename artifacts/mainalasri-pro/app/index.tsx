@@ -5,7 +5,6 @@ import * as Haptics from "expo-haptics";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Animated,
-  I18nManager,
   Platform,
   Pressable,
   ScrollView,
@@ -20,8 +19,6 @@ import { Toast } from "@/components/Toast";
 import { useColors } from "@/hooks/useColors";
 
 const native = Platform.OS !== "web";
-
-I18nManager.forceRTL(true);
 
 interface DeviceInfo {
   model: string;
