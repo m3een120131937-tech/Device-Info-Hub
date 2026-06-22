@@ -1,8 +1,7 @@
-import * as Battery from "expo-battery";
-import * as Device from "expo-device";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { router } from "expo-router";
+import React, { useEffect, useState } from "react";
 import {
   Animated,
   Platform,
@@ -12,10 +11,8 @@ import {
   Text,
   View,
 } from "react-native";
-
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Toast } from "@/components/Toast";
 import { useColors } from "@/hooks/useColors";
 
 const native = Platform.OS !== "web";
@@ -34,45 +31,15 @@ interface Tool {
   labelAr: string;
   icon: keyof typeof MaterialCommunityIcons.glyphMap;
   color: string;
-  toastMsg: string;
+  route: string;
 }
 
 const TOOLS: Tool[] = [
-  {
-    id: "frp",
-    labelAr: "أدوات FRP",
-    icon: "shield-lock",
-    color: "#ff6b35",
-    toastMsg: "🔓 جارٍ فتح أدوات FRP",
-  },
-  {
-    id: "flash",
-    labelAr: "أدوات الفلاش",
-    icon: "flash",
-    color: "#ffd700",
-    toastMsg: "⚡ جارٍ فتح أدوات الفلاش",
-  },
-  {
-    id: "imei",
-    labelAr: "أدوات IMEI",
-    icon: "sim",
-    color: "#00d4ff",
-    toastMsg: "📡 جارٍ فتح أدوات IMEI",
-  },
-  {
-    id: "network",
-    labelAr: "أدوات الشبكة",
-    icon: "wifi",
-    color: "#4ade80",
-    toastMsg: "🌐 جارٍ فتح أدوات الشبكة",
-  },
-  {
-    id: "qr",
-    labelAr: "ماسح QR",
-    icon: "qrcode-scan",
-    color: "#a855f7",
-    toastMsg: "📷 جارٍ فتح ماسح QR",
-  },
+  { id: "frp",     labelAr: "أدوات FRP",     icon: "shield-lock",  color: "#ff6b35", route: "/tools/frp" },
+  { id: "flash",   labelAr: "أدوات الفلاش",  icon: "flash",        color: "#ffd700", route: "/tools/flash" },
+  { id: "imei",    labelAr: "أدوات IMEI",    icon: "sim",          color: "#00d4ff", route: "/tools/imei" },
+  { id: "network", labelAr: "أدوات الشبكة", icon: "wifi",         color: "#4ade80", route: "/tools/network" },
+  { id: "qr",      labelAr: "ماسح QR",       icon: "qrcode-scan",  color: "#a855f7", route: "/tools/qr" },
 ];
 
 export default function HomeScreen() {
@@ -87,25 +54,6 @@ export default function HomeScreen() {
     loaded: false,
   });
 
-  const [toastMessage, setToastMessage] = useState("");
-  const [toastVisible, setToastVisible] = useState(false);
-  const [toastColor, setToastColor] = useState("#00d4ff");
-  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const showToast = useCallback((msg: string, color: string) => {
-    if (toastTimer.current) clearTimeout(toastTimer.current);
-    setToastMessage(msg);
-    setToastColor(color);
-    setToastVisible(true);
-    toastTimer.current = setTimeout(() => setToastVisible(false), 2500);
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      if (toastTimer.current) clearTimeout(toastTimer.current);
-    };
-  }, []);
-
   useEffect(() => {
     async function loadInfo() {
       let model = "غير معروف";
@@ -114,38 +62,37 @@ export default function HomeScreen() {
       let batteryLevel: number | null = null;
       let isCharging = false;
 
-      try {
-        if (Device.modelName) model = Device.modelName;
-        else if (Device.deviceName) model = Device.deviceName;
-        if (Device.osVersion) androidVersion = `Android ${Device.osVersion}`;
-        if (Device.totalMemory) {
-          const gb = Device.totalMemory / 1024 / 1024 / 1024;
-          totalRam = `${gb.toFixed(1)} GB`;
-        }
-      } catch {
-        /* ignore */
-      }
-
       if (Platform.OS !== "web") {
         try {
+          // Dynamic require — available in Expo Go without package.json dependency
+          // eslint-disable-next-line @typescript-eslint/no-var-requires
+          const Device = require("expo-device");
+          if (Device.modelName) model = Device.modelName;
+          else if (Device.deviceName) model = Device.deviceName;
+          if (Device.osVersion) androidVersion = `Android ${Device.osVersion}`;
+          if (Device.totalMemory) {
+            totalRam = `${(Device.totalMemory / 1024 / 1024 / 1024).toFixed(1)} GB`;
+          }
+        } catch { /* ignore */ }
+
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-var-requires
+          const Battery = require("expo-battery");
           const level = await Battery.getBatteryLevelAsync();
           if (level >= 0) batteryLevel = Math.round(level * 100);
           const state = await Battery.getBatteryStateAsync();
           isCharging =
             state === Battery.BatteryState.CHARGING ||
             state === Battery.BatteryState.FULL;
-        } catch {
-          /* ignore */
-        }
+        } catch { /* ignore */ }
       }
 
       setDeviceInfo({ model, androidVersion, totalRam, batteryLevel, isCharging, loaded: true });
     }
-
     loadInfo();
   }, []);
 
-  function batteryColor(level: number | null): string {
+  function batteryColor(level: number | null) {
     if (level === null) return colors.mutedForeground;
     if (level > 50) return "#4ade80";
     if (level > 20) return "#ffd700";
@@ -161,95 +108,51 @@ export default function HomeScreen() {
         style={{ flex: 1 }}
         contentContainerStyle={[
           styles.scroll,
-          {
-            paddingTop: insets.top + 20 + webTop,
-            paddingBottom: insets.bottom + 40 + webBottom,
-          },
+          { paddingTop: insets.top + 20 + webTop, paddingBottom: insets.bottom + 40 + webBottom },
         ]}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.headerRow}>
-            <View style={{ flex: 1 }}>
-              <Text style={[styles.appTitle, { color: colors.foreground }]}>Mainalasri Pro</Text>
-              <Text style={[styles.appSubtitle, { color: colors.mutedForeground }]}>
-                مجموعة أدوات الهاتف الاحترافية
-              </Text>
-            </View>
-            <View
-              style={[
-                styles.logoCircle,
-                { backgroundColor: colors.primary + "22", borderColor: colors.primary + "44" },
-              ]}
-            >
-              <MaterialCommunityIcons name="shield-check" size={28} color={colors.primary} />
-            </View>
+        <View style={styles.headerRow}>
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.appTitle, { color: colors.foreground }]}>Mainalasri Pro</Text>
+            <Text style={[styles.appSubtitle, { color: colors.mutedForeground }]}>
+              مجموعة أدوات الهاتف الاحترافية
+            </Text>
+          </View>
+          <View style={[styles.logoCircle, { backgroundColor: colors.primary + "22", borderColor: colors.primary + "44" }]}>
+            <MaterialCommunityIcons name="shield-check" size={28} color={colors.primary} />
           </View>
         </View>
 
         {/* Device Info Card */}
-        <View
-          style={[
-            styles.infoCard,
-            { backgroundColor: colors.card, borderColor: colors.border },
-          ]}
-        >
+        <View style={[styles.infoCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <View style={[styles.infoCardHeader, { borderBottomColor: colors.border }]}>
             <MaterialCommunityIcons name="cellphone-information" size={18} color={colors.primary} />
             <Text style={[styles.infoCardTitle, { color: colors.foreground }]}>معلومات الجهاز</Text>
-            <View style={[styles.dot, { backgroundColor: colors.primary }]} />
+            <View style={[styles.dot, { backgroundColor: deviceInfo.loaded ? "#4ade80" : colors.mutedForeground }]} />
           </View>
-
           <View style={styles.infoGrid}>
-            <InfoItem
-              icon="cellphone"
-              label="الموديل"
-              value={deviceInfo.model}
-              accent="#00d4ff"
-              textColor={colors.foreground}
-              subColor={colors.mutedForeground}
-              loaded={deviceInfo.loaded}
-            />
-            <InfoItem
-              icon="android"
-              label="نظام التشغيل"
-              value={deviceInfo.androidVersion}
-              accent="#4ade80"
-              textColor={colors.foreground}
-              subColor={colors.mutedForeground}
-              loaded={deviceInfo.loaded}
-            />
-            <InfoItem
-              icon="memory"
-              label="الذاكرة الكلية"
-              value={deviceInfo.totalRam}
-              accent="#a855f7"
-              textColor={colors.foreground}
-              subColor={colors.mutedForeground}
-              loaded={deviceInfo.loaded}
-            />
+            <InfoItem icon="cellphone"      label="الموديل"        value={deviceInfo.model}         accent="#00d4ff" colors={colors} loaded={deviceInfo.loaded} />
+            <InfoItem icon="android"        label="نظام التشغيل"   value={deviceInfo.androidVersion} accent="#4ade80" colors={colors} loaded={deviceInfo.loaded} />
+            <InfoItem icon="memory"         label="الذاكرة الكلية" value={deviceInfo.totalRam}       accent="#a855f7" colors={colors} loaded={deviceInfo.loaded} />
             <InfoItem
               icon={deviceInfo.isCharging ? "battery-charging" : "battery-80"}
               label="البطارية"
               value={
                 deviceInfo.batteryLevel !== null
                   ? `${deviceInfo.batteryLevel}%${deviceInfo.isCharging ? " ⚡" : ""}`
-                  : Platform.OS === "web"
-                  ? "— (تصفح ويب)"
-                  : "غير متاح"
+                  : Platform.OS === "web" ? "— (ويب)" : "غير متاح"
               }
               accent={batteryColor(deviceInfo.batteryLevel)}
-              textColor={colors.foreground}
-              subColor={colors.mutedForeground}
+              colors={colors}
               loaded={deviceInfo.loaded}
             />
           </View>
         </View>
 
-        {/* Tools Section */}
+        {/* Tools Grid */}
         <Text style={[styles.sectionTitle, { color: colors.foreground }]}>الأدوات</Text>
-
         <View style={styles.toolsGrid}>
           {TOOLS.map((tool) => (
             <ToolCard
@@ -260,7 +163,7 @@ export default function HomeScreen() {
               labelColor={colors.foreground}
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                showToast(tool.toastMsg, tool.color);
+                router.push(tool.route as any);
               }}
             />
           ))}
@@ -268,89 +171,48 @@ export default function HomeScreen() {
 
         {/* Footer */}
         <View style={styles.footer}>
-          <Text style={[styles.footerText, { color: colors.mutedForeground }]}>
-            Mainalasri Pro • الإصدار 1.0.0
-          </Text>
-          <Text style={[styles.footerSub, { color: colors.mutedForeground }]}>
-            جميع الحقوق محفوظة © 2025
-          </Text>
+          <Text style={[styles.footerText, { color: colors.mutedForeground }]}>Mainalasri Pro • v1.0.0</Text>
+          <Text style={[styles.footerSub, { color: colors.mutedForeground }]}>جميع الحقوق محفوظة © 2025</Text>
         </View>
       </ScrollView>
-
-      <Toast message={toastMessage} visible={toastVisible} color={toastColor} />
     </View>
   );
 }
 
-/* ─── InfoItem ─────────────────────────────────── */
+/* ─── InfoItem ─────────────────────────────── */
 function InfoItem({
-  icon,
-  label,
-  value,
-  accent,
-  textColor,
-  subColor,
-  loaded,
+  icon, label, value, accent, colors, loaded,
 }: {
   icon: keyof typeof MaterialCommunityIcons.glyphMap;
   label: string;
   value: string;
   accent: string;
-  textColor: string;
-  subColor: string;
+  colors: ReturnType<typeof useColors>;
   loaded: boolean;
 }) {
   return (
-    <View style={infoItemStyles.container}>
-      <View style={[infoItemStyles.iconWrap, { backgroundColor: accent + "22" }]}>
+    <View style={infoStyles.wrap}>
+      <View style={[infoStyles.iconWrap, { backgroundColor: accent + "22" }]}>
         <MaterialCommunityIcons name={icon} size={22} color={accent} />
       </View>
-      <Text style={[infoItemStyles.label, { color: subColor }]}>{label}</Text>
-      <Text
-        style={[infoItemStyles.value, { color: loaded ? textColor : subColor }]}
-        numberOfLines={2}
-        adjustsFontSizeToFit
-      >
+      <Text style={[infoStyles.label, { color: colors.mutedForeground }]}>{label}</Text>
+      <Text style={[infoStyles.value, { color: loaded ? colors.foreground : colors.mutedForeground }]} numberOfLines={2} adjustsFontSizeToFit>
         {value}
       </Text>
     </View>
   );
 }
 
-const infoItemStyles = StyleSheet.create({
-  container: {
-    width: "48%",
-    alignItems: "center",
-    paddingVertical: 16,
-  },
-  iconWrap: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 8,
-  },
-  label: {
-    fontSize: 11,
-    fontFamily: "Inter_400Regular",
-    marginBottom: 4,
-    textAlign: "center",
-  },
-  value: {
-    fontSize: 13,
-    fontFamily: "Inter_600SemiBold",
-    textAlign: "center",
-  },
+const infoStyles = StyleSheet.create({
+  wrap: { width: "48%", alignItems: "center", paddingVertical: 14 },
+  iconWrap: { width: 44, height: 44, borderRadius: 22, alignItems: "center", justifyContent: "center", marginBottom: 8 },
+  label: { fontSize: 11, fontFamily: "Inter_400Regular", marginBottom: 4, textAlign: "center" },
+  value: { fontSize: 13, fontFamily: "Inter_600SemiBold", textAlign: "center" },
 });
 
-/* ─── ToolCard ─────────────────────────────────── */
+/* ─── ToolCard ─────────────────────────────── */
 function ToolCard({
-  tool,
-  cardBg,
-  cardBorder,
-  labelColor,
-  onPress,
+  tool, cardBg, cardBorder, labelColor, onPress,
 }: {
   tool: Tool;
   cardBg: string;
@@ -358,38 +220,21 @@ function ToolCard({
   labelColor: string;
   onPress: () => void;
 }) {
-  const scale = useRef(new Animated.Value(1)).current;
-
-  function handlePressIn() {
-    Animated.spring(scale, { toValue: 0.93, useNativeDriver: native, speed: 50 }).start();
-  }
-
-  function handlePressOut() {
-    Animated.spring(scale, { toValue: 1, useNativeDriver: native, speed: 20 }).start();
-  }
+  const scale = React.useRef(new Animated.Value(1)).current;
 
   return (
     <Pressable
       onPress={onPress}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-      style={toolCardStyles.pressable}
+      onPressIn={() => Animated.spring(scale, { toValue: 0.93, useNativeDriver: native, speed: 50 }).start()}
+      onPressOut={() => Animated.spring(scale, { toValue: 1, useNativeDriver: native, speed: 20 }).start()}
+      style={cardStyles.pressable}
     >
-      <Animated.View
-        style={[
-          toolCardStyles.card,
-          {
-            backgroundColor: cardBg,
-            borderColor: cardBorder,
-            transform: [{ scale }],
-          },
-        ]}
-      >
-        <View style={[toolCardStyles.iconCircle, { backgroundColor: tool.color + "22" }]}>
+      <Animated.View style={[cardStyles.card, { backgroundColor: cardBg, borderColor: cardBorder, transform: [{ scale }] }]}>
+        <View style={[cardStyles.iconCircle, { backgroundColor: tool.color + "22" }]}>
           <MaterialCommunityIcons name={tool.icon} size={32} color={tool.color} />
         </View>
-        <Text style={[toolCardStyles.label, { color: labelColor }]}>{tool.labelAr}</Text>
-        <View style={[toolCardStyles.pill, { backgroundColor: tool.color + "33" }]}>
+        <Text style={[cardStyles.label, { color: labelColor }]}>{tool.labelAr}</Text>
+        <View style={[cardStyles.pill, { backgroundColor: tool.color + "33" }]}>
           <MaterialCommunityIcons name="chevron-left" size={14} color={tool.color} />
         </View>
       </Animated.View>
@@ -397,127 +242,30 @@ function ToolCard({
   );
 }
 
-const toolCardStyles = StyleSheet.create({
-  pressable: {
-    width: "47%",
-  },
-  card: {
-    borderRadius: 18,
-    borderWidth: 1,
-    padding: 18,
-    alignItems: "center",
-    gap: 10,
-  },
-  iconCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  label: {
-    fontSize: 14,
-    fontFamily: "Inter_600SemiBold",
-    textAlign: "center",
-  },
-  pill: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+const cardStyles = StyleSheet.create({
+  pressable: { width: "47%" },
+  card: { borderRadius: 18, borderWidth: 1, padding: 18, alignItems: "center", gap: 10 },
+  iconCircle: { width: 64, height: 64, borderRadius: 32, alignItems: "center", justifyContent: "center" },
+  label: { fontSize: 14, fontFamily: "Inter_600SemiBold", textAlign: "center" },
+  pill: { width: 26, height: 26, borderRadius: 13, alignItems: "center", justifyContent: "center" },
 });
 
-/* ─── Page Styles ──────────────────────────────── */
+/* ─── Page Styles ───────────────────────────── */
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-  },
-  scroll: {
-    paddingHorizontal: 20,
-  },
-  header: {
-    marginBottom: 22,
-  },
-  headerRow: {
-    flexDirection: "row-reverse",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 12,
-  },
-  logoCircle: {
-    width: 54,
-    height: 54,
-    borderRadius: 27,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-  },
-  appTitle: {
-    fontSize: 26,
-    fontFamily: "Inter_700Bold",
-    textAlign: "right",
-  },
-  appSubtitle: {
-    fontSize: 13,
-    fontFamily: "Inter_400Regular",
-    textAlign: "right",
-    marginTop: 3,
-  },
-  infoCard: {
-    borderRadius: 20,
-    borderWidth: 1,
-    padding: 16,
-    marginBottom: 26,
-  },
-  infoCardHeader: {
-    flexDirection: "row-reverse",
-    alignItems: "center",
-    gap: 8,
-    marginBottom: 12,
-    paddingBottom: 12,
-    borderBottomWidth: 1,
-  },
-  infoCardTitle: {
-    flex: 1,
-    fontSize: 15,
-    fontFamily: "Inter_600SemiBold",
-    textAlign: "right",
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  infoGrid: {
-    flexDirection: "row-reverse",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontFamily: "Inter_700Bold",
-    textAlign: "right",
-    marginBottom: 14,
-  },
-  toolsGrid: {
-    flexDirection: "row-reverse",
-    flexWrap: "wrap",
-    gap: 12,
-    marginBottom: 36,
-  },
-  footer: {
-    alignItems: "center",
-    gap: 4,
-  },
-  footerText: {
-    fontSize: 12,
-    fontFamily: "Inter_500Medium",
-  },
-  footerSub: {
-    fontSize: 11,
-    fontFamily: "Inter_400Regular",
-    textAlign: "center",
-  },
+  root: { flex: 1 },
+  scroll: { paddingHorizontal: 20 },
+  headerRow: { flexDirection: "row-reverse", justifyContent: "space-between", alignItems: "center", gap: 12, marginBottom: 22 },
+  logoCircle: { width: 54, height: 54, borderRadius: 27, alignItems: "center", justifyContent: "center", borderWidth: 1 },
+  appTitle: { fontSize: 26, fontFamily: "Inter_700Bold", textAlign: "right" },
+  appSubtitle: { fontSize: 13, fontFamily: "Inter_400Regular", textAlign: "right", marginTop: 3 },
+  infoCard: { borderRadius: 20, borderWidth: 1, padding: 16, marginBottom: 26 },
+  infoCardHeader: { flexDirection: "row-reverse", alignItems: "center", gap: 8, marginBottom: 12, paddingBottom: 12, borderBottomWidth: 1 },
+  infoCardTitle: { flex: 1, fontSize: 15, fontFamily: "Inter_600SemiBold", textAlign: "right" },
+  dot: { width: 8, height: 8, borderRadius: 4 },
+  infoGrid: { flexDirection: "row-reverse", flexWrap: "wrap", justifyContent: "space-between" },
+  sectionTitle: { fontSize: 18, fontFamily: "Inter_700Bold", textAlign: "right", marginBottom: 14 },
+  toolsGrid: { flexDirection: "row-reverse", flexWrap: "wrap", gap: 12, marginBottom: 36 },
+  footer: { alignItems: "center", gap: 4 },
+  footerText: { fontSize: 12, fontFamily: "Inter_500Medium" },
+  footerSub: { fontSize: 11, fontFamily: "Inter_400Regular", textAlign: "center" },
 });

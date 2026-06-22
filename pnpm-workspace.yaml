@@ -75,6 +75,10 @@ onlyBuiltDependencies:
   - unrs-resolver
 
 overrides:
+  # Force expo-modules-core to the SDK 54 compatible version (2.x).
+  # Without this, pnpm resolves to 1.12.26 (too old) or 3.0.30 (SDK 55+),
+  # both of which are missing registerWebModule used by expo-font@14.
+  "expo-modules-core": "~2.2.0"
   # replit uses linux-x64 only, we can exclude all other platforms
   "esbuild>@esbuild/darwin-arm64": "-"
   "esbuild>@esbuild/darwin-x64": "-"

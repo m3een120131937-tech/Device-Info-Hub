@@ -24,15 +24,22 @@ const queryClient = new QueryClient();
 function RootLayoutNav() {
   const scheme = useColorScheme();
   const isDark = scheme === "dark";
+  const bg = isDark ? "#080c18" : "#f0f4f8";
 
   return (
     <Stack
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: isDark ? "#080c18" : "#f0f4f8" },
+        contentStyle: { backgroundColor: bg },
+        animation: "slide_from_left",
       }}
     >
       <Stack.Screen name="index" />
+      <Stack.Screen name="tools/frp" />
+      <Stack.Screen name="tools/flash" />
+      <Stack.Screen name="tools/imei" />
+      <Stack.Screen name="tools/network" />
+      <Stack.Screen name="tools/qr" />
     </Stack>
   );
 }
