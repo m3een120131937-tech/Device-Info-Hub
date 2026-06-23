@@ -3,6 +3,7 @@ import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
+  Linking,
   Platform,
   Pressable,
   ScrollView,
@@ -12,60 +13,187 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
+import ToolActionSheet, { copyToClipboard, ToolOption } from "@/components/ToolActionSheet";
 
-const STEPS = [
+const OPTIONS: ToolOption[] = [
   {
-    step: "1",
+    id: "factory-reset",
     title: "إعادة ضبط المصنع",
-    desc: "من إعدادات الجهاز → الإدارة العامة → إعادة الضبط → إعادة ضبط بيانات المصنع",
-    icon: "restore" as const,
+    subtitle: "Factory Reset",
+    icon: "restore",
     color: "#ff6b35",
+    warning: "سيُحذف جميع بيانات الجهاز نهائياً",
+    auto: {
+      description: "سيفتح التطبيق صفحة الإعدادات مباشرةً للوصول لخيار إعادة الضبط",
+      steps: [
+        "يفتح التطبيق إعدادات الجهاز تلقائياً",
+        "توجّه إلى: الإدارة العامة أو النظام",
+        "اضغط على 'إعادة الضبط'",
+        "اختر 'إعادة ضبط بيانات المصنع'",
+        "اضغط 'إعادة الضبط' للتأكيد",
+      ],
+      actionLabel: "فتح الإعدادات تلقائياً",
+      actionIcon: "cog",
+      canAct: true,
+      onAction: () => Linking.openURL("https://support.google.com/android/answer/6088915"),
+    },
+    manual: {
+      description: "اتبع هذه الخطوات بنفسك من إعدادات الجهاز",
+      steps: [
+        "افتح تطبيق الإعدادات ⚙️",
+        "انتقل إلى 'الإدارة العامة' أو 'النظام'",
+        "اضغط على 'إعادة الضبط'",
+        "اختر 'إعادة ضبط بيانات المصنع'",
+        "اقرأ التحذيرات ثم اضغط 'إعادة الضبط'",
+        "أدخل رمز PIN إن طُلب منك",
+        "انتظر اكتمال عملية الضبط (~5 دقائق)",
+      ],
+    },
   },
   {
-    step: "2",
+    id: "recovery-bypass",
     title: "تجاوز عبر Recovery",
-    desc: "أدخل وضع Recovery (Power + Vol Down) → Wipe Data → Factory Reset",
-    icon: "android" as const,
+    subtitle: "Recovery Mode Bypass",
+    icon: "android",
     color: "#ffd700",
+    warning: "تأكد من شحن البطارية > 50% قبل البدء",
+    auto: {
+      description: "سيعرض التطبيق دليلاً مرئياً بتسلسل الأزرار خطوة بخطوة",
+      steps: [
+        "أطفئ الجهاز تماماً واضغط زر الطاقة 10 ثوانٍ",
+        "بعد الإطفاء: اضغط Power + Volume Down معاً",
+        "انتظر ظهور شاشة Recovery (عادة 5-10 ثوانٍ)",
+        "استخدم أزرار الصوت للتنقل — اختر 'Wipe Data'",
+        "اضغط زر الطاقة للتأكيد ثم 'Factory Reset'",
+      ],
+      actionLabel: "عرض دليل الأزرار",
+      actionIcon: "gesture-tap-button",
+      canAct: true,
+      onAction: () => Linking.openURL("https://www.android.com/intl/ar_ae/"),
+    },
+    manual: {
+      description: "خطوات تفصيلية للدخول لوضع Recovery وتجاوز FRP",
+      steps: [
+        "أطفئ الجهاز من زر الطاقة → إيقاف تشغيل",
+        "اضغط Power + Vol Down (سامسونج) أو Power + Vol Up (آيفون وبعض الأندرويد)",
+        "عند ظهور شاشة Recovery استخدم أزرار الصوت للتنقل",
+        "اختر 'Apply update from ADB' أو 'Wipe Data'",
+        "اختر 'Factory Reset' وأكّد العملية",
+        "بعد الانتهاء اختر 'Reboot system now'",
+        "سيُعاد تشغيل الجهاز بدون FRP",
+      ],
+    },
   },
   {
-    step: "3",
+    id: "remove-google",
     title: "إزالة حساب Google",
-    desc: "الإعدادات → الحسابات → Google → احذف الحساب قبل إعادة الضبط",
-    icon: "google" as const,
+    subtitle: "Remove Google Account",
+    icon: "google",
     color: "#4ade80",
+    warning: "أزِل الحساب قبل إعادة الضبط لتجنب FRP",
+    auto: {
+      description: "سيفتح التطبيق صفحة إعدادات الحسابات مباشرةً",
+      steps: [
+        "يفتح التطبيق إعدادات حسابات Google",
+        "اختر حساب Google المطلوب إزالته",
+        "اضغط 'إزالة الحساب' للحذف",
+      ],
+      actionLabel: "فتح إعدادات الحسابات",
+      actionIcon: "account-cog",
+      canAct: true,
+      onAction: () => Linking.openURL("https://myaccount.google.com/"),
+    },
+    manual: {
+      description: "كيفية إزالة حساب Google يدوياً قبل إعادة الضبط",
+      steps: [
+        "افتح الإعدادات ← الحسابات والنسخ الاحتياطي",
+        "اضغط على 'إدارة الحسابات'",
+        "اختر حساب Google من القائمة",
+        "اضغط على 'إزالة الحساب'",
+        "أكّد الإزالة في نافذة التأكيد",
+        "الآن يمكنك إعادة الضبط دون FRP",
+      ],
+    },
   },
   {
-    step: "4",
+    id: "frp-otg",
     title: "FRP عبر OTG",
-    desc: "استخدم كابل OTG مع USB للوصول لأدوات ADB وتجاوز قفل FRP",
-    icon: "usb" as const,
+    subtitle: "OTG ADB Bypass",
+    icon: "usb",
     color: "#00d4ff",
+    auto: {
+      description: "سينسخ التطبيق أمر ADB جاهز للتنفيذ على حاسوبك",
+      steps: [
+        "يُنسخ أمر ADB لتجاوز FRP تلقائياً إلى الحافظة",
+        "افتح cmd أو Terminal على حاسوبك",
+        "الصق الأمر واضغط Enter",
+        "الأمر: adb shell content insert --uri content://settings/secure --bind name:s:user_setup_complete --bind value:s:1",
+      ],
+      actionLabel: "نسخ أمر ADB",
+      actionIcon: "content-copy",
+      canAct: true,
+      onAction: () =>
+        copyToClipboard(
+          "adb shell content insert --uri content://settings/secure --bind name:s:user_setup_complete --bind value:s:1"
+        ),
+    },
+    manual: {
+      description: "خطوات تجاوز FRP عبر كابل OTG وبرامج ADB",
+      steps: [
+        "حمّل ADB من موقع Android Developer",
+        "فعّل USB Debugging عبر وضع Recovery إن أمكن",
+        "وصّل الجهاز بالحاسوب عبر USB",
+        "افتح cmd واكتب: adb devices — تأكد ظهور الجهاز",
+        "نفّذ: adb shell content insert --uri content://settings/secure...",
+        "أعِد تشغيل الجهاز — سيختفي FRP",
+      ],
+    },
   },
   {
-    step: "5",
+    id: "odin-samsung",
     title: "أداة Odin (Samsung)",
-    desc: "لأجهزة Samsung: استخدم Odin لفلاش firmware جديد يُزيل FRP",
-    icon: "database" as const,
+    subtitle: "Samsung Odin Flash Tool",
+    icon: "database",
     color: "#a855f7",
+    warning: "يُبطل الضمان على بعض أجهزة Samsung",
+    auto: {
+      description: "سيفتح التطبيق رابط تحميل Odin الرسمي مباشرةً",
+      steps: [
+        "يفتح رابط تحميل Odin من المصدر الرسمي",
+        "حمّل الإصدار المناسب (Odin 3.14+)",
+        "حمّل firmware جهازك من SamFw أو samfrew",
+        "أدخل الجهاز في Download Mode",
+        "شغّل Odin على Windows وابدأ الفلاش",
+      ],
+      actionLabel: "فتح رابط Odin",
+      actionIcon: "download",
+      canAct: true,
+      onAction: () => Linking.openURL("https://odindownload.com/"),
+    },
+    manual: {
+      description: "خطوات استخدام Odin لفلاش Samsung وإزالة FRP",
+      steps: [
+        "حمّل Odin من: odindownload.com",
+        "حمّل firmware جهازك من: samfw.com أو samfrew.com",
+        "أدخل جهاز Samsung في Download Mode (Power + Vol Down + Home)",
+        "وصّل الجهاز بالحاسوب عبر USB",
+        "افتح Odin وانتظر ظهور COM port باللون الأزرق",
+        "في قسم AP اختر ملف firmware المحمّل (.tar.md5)",
+        "اضغط Start وانتظر انتهاء الفلاش (~10 دقائق)",
+        "سيُعاد تشغيل الجهاز بدون FRP",
+      ],
+    },
   },
-];
-
-const TIPS = [
-  "تأكد من شحن البطارية > 50% قبل البدء",
-  "احتفظ بنسخة احتياطية من بياناتك",
-  "هذه الأدوات للاستخدام الشخصي فقط على أجهزتك",
 ];
 
 export default function FRPScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const [expanded, setExpanded] = useState<string | null>(null);
   const webTop = Platform.OS === "web" ? 67 : 0;
+  const [selected, setSelected] = useState<ToolOption | null>(null);
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
-      {/* Header */}
       <View
         style={[
           styles.header,
@@ -88,13 +216,14 @@ export default function FRPScreen() {
           </View>
           <View>
             <Text style={[styles.titleText, { color: colors.foreground }]}>أدوات FRP</Text>
-            <Text style={[styles.subtitleText, { color: colors.mutedForeground }]}>Factory Reset Protection</Text>
+            <Text style={[styles.subtitleText, { color: colors.mutedForeground }]}>
+              Factory Reset Protection
+            </Text>
           </View>
         </View>
       </View>
 
       <ScrollView contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 32 }]}>
-        {/* Warning Card */}
         <View style={[styles.warnCard, { backgroundColor: "#ff6b3515", borderColor: "#ff6b3540" }]}>
           <MaterialCommunityIcons name="alert-circle" size={18} color="#ff6b35" />
           <Text style={[styles.warnText, { color: "#ff6b35" }]}>
@@ -102,45 +231,53 @@ export default function FRPScreen() {
           </Text>
         </View>
 
-        {/* Steps */}
-        <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>خطوات تجاوز FRP</Text>
-        {STEPS.map((item) => (
+        <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>
+          اختر الأداة المطلوبة
+        </Text>
+        <Text style={[styles.hint, { color: colors.mutedForeground }]}>
+          كل أداة تدعم وضعَين: تلقائي ⚡ أو يدوي 📖
+        </Text>
+
+        {OPTIONS.map((opt) => (
           <Pressable
-            key={item.step}
+            key={opt.id}
             onPress={() => {
               Haptics.selectionAsync();
-              setExpanded(expanded === item.step ? null : item.step);
+              setSelected(opt);
             }}
-            style={[styles.stepCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+            style={[styles.optCard, { backgroundColor: colors.card, borderColor: colors.border }]}
           >
-            <View style={styles.stepRow}>
-              <View style={[styles.stepBadge, { backgroundColor: item.color + "22" }]}>
-                <MaterialCommunityIcons name={item.icon} size={20} color={item.color} />
+            <View style={styles.optRow}>
+              <View style={[styles.optIcon, { backgroundColor: opt.color + "22" }]}>
+                <MaterialCommunityIcons name={opt.icon as "home"} size={22} color={opt.color} />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={[styles.stepTitle, { color: colors.foreground }]}>{item.title}</Text>
-                {expanded === item.step && (
-                  <Text style={[styles.stepDesc, { color: colors.mutedForeground }]}>{item.desc}</Text>
-                )}
+                <Text style={[styles.optTitle, { color: colors.foreground }]}>{opt.title}</Text>
+                {opt.subtitle ? (
+                  <Text style={[styles.optSub, { color: colors.mutedForeground }]}>{opt.subtitle}</Text>
+                ) : null}
               </View>
-              <MaterialCommunityIcons
-                name={expanded === item.step ? "chevron-up" : "chevron-down"}
-                size={18}
-                color={colors.mutedForeground}
-              />
+              <View style={styles.modePillsRow}>
+                <View style={[styles.pill, { backgroundColor: "#ffd70018" }]}>
+                  <MaterialCommunityIcons name="lightning-bolt" size={11} color="#ffd700" />
+                  <Text style={[styles.pillText, { color: "#ffd700" }]}>تلقائي</Text>
+                </View>
+                <View style={[styles.pill, { backgroundColor: "#00d4ff18" }]}>
+                  <MaterialCommunityIcons name="book-open-variant" size={11} color="#00d4ff" />
+                  <Text style={[styles.pillText, { color: "#00d4ff" }]}>يدوي</Text>
+                </View>
+              </View>
+              <MaterialCommunityIcons name="chevron-left" size={18} color={colors.mutedForeground} />
             </View>
           </Pressable>
         ))}
-
-        {/* Tips */}
-        <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>نصائح مهمة</Text>
-        {TIPS.map((tip, i) => (
-          <View key={i} style={[styles.tipRow, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <MaterialCommunityIcons name="check-circle" size={16} color="#4ade80" />
-            <Text style={[styles.tipText, { color: colors.foreground }]}>{tip}</Text>
-          </View>
-        ))}
       </ScrollView>
+
+      <ToolActionSheet
+        visible={selected !== null}
+        option={selected}
+        onClose={() => setSelected(null)}
+      />
     </View>
   );
 }
@@ -157,24 +294,54 @@ const styles = StyleSheet.create({
   },
   backBtn: { padding: 4 },
   headerTitle: { flexDirection: "row-reverse", alignItems: "center", gap: 10, flex: 1 },
-  headerIcon: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
+  headerIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   titleText: { fontSize: 18, fontWeight: "bold", textAlign: "right" },
   subtitleText: { fontSize: 12, textAlign: "right" },
   scroll: { padding: 16, gap: 10 },
   warnCard: {
-    flexDirection: "row-reverse", alignItems: "center", gap: 8,
-    padding: 12, borderRadius: 12, borderWidth: 1, marginBottom: 6,
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 8,
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginBottom: 4,
   },
   warnText: { flex: 1, fontSize: 13, fontWeight: "500", textAlign: "right" },
-  sectionLabel: { fontSize: 12, fontWeight: "600", textAlign: "right", marginTop: 8, marginBottom: 4, textTransform: "uppercase" },
-  stepCard: { borderRadius: 14, borderWidth: 1, padding: 14 },
-  stepRow: { flexDirection: "row-reverse", alignItems: "center", gap: 12 },
-  stepBadge: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
-  stepTitle: { fontSize: 14, fontWeight: "600", textAlign: "right" },
-  stepDesc: { fontSize: 13, textAlign: "right", marginTop: 6, lineHeight: 20 },
-  tipRow: {
-    flexDirection: "row-reverse", alignItems: "center", gap: 10,
-    padding: 12, borderRadius: 12, borderWidth: 1,
+  sectionLabel: {
+    fontSize: 12,
+    fontWeight: "700",
+    textAlign: "right",
+    marginTop: 4,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
-  tipText: { flex: 1, fontSize: 13, textAlign: "right" },
+  hint: { fontSize: 12, textAlign: "right", marginBottom: 4 },
+  optCard: { borderRadius: 16, borderWidth: 1, padding: 14 },
+  optRow: { flexDirection: "row-reverse", alignItems: "center", gap: 12 },
+  optIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  optTitle: { fontSize: 15, fontWeight: "600", textAlign: "right" },
+  optSub: { fontSize: 12, textAlign: "right", marginTop: 1 },
+  modePillsRow: { flexDirection: "row-reverse", gap: 5 },
+  pill: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 3,
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: 20,
+  },
+  pillText: { fontSize: 10, fontWeight: "600" },
 });
