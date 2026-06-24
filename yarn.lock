@@ -3041,7 +3041,7 @@ expo-asset@~10.0.10:
 
 expo-battery@~8.0.1:
   version "8.0.1"
-  resolved "http://package-firewall.replit.local/npm/expo-battery/-/expo-battery-8.0.1.tgz#9aa7e189e921146123da1fc6d41f1f6227eeca33"
+  resolved "https://registry.npmjs.org/expo-battery/-/expo-battery-8.0.1.tgz#9aa7e189e921146123da1fc6d41f1f6227eeca33"
   integrity sha512-4lpwvKPCKzXn91UYJu/tYDgN1mLMb678P6H9M61t6Asmp8B8FpRi/AAhs2FhLatw1iM3Jz6lIREUNkrW0Cn3nQ==
 
 expo-constants@~16.0.0:
