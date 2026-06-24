@@ -3039,10 +3039,10 @@ expo-asset@~10.0.10:
     invariant "^2.2.4"
     md5-file "^3.2.3"
 
-expo-battery@^56.0.4:
-  version "56.0.4"
-  resolved "https://registry.npmjs.org/expo-battery/-/expo-battery-56.0.4.tgz#0b540eb8840fb4fa89ab75e56ea3f8cef84a1e16"
-  integrity sha512-JkWVSAt8WUgMxSxK8kNm6xOM7E+J7kTyNKqFoGgmALjz04h0w9rffQg9VrD1WXPhp2nWFvhy5yZryY6Xe9YU8g==
+expo-battery@~8.0.1:
+  version "8.0.1"
+  resolved "http://package-firewall.replit.local/npm/expo-battery/-/expo-battery-8.0.1.tgz#9aa7e189e921146123da1fc6d41f1f6227eeca33"
+  integrity sha512-4lpwvKPCKzXn91UYJu/tYDgN1mLMb678P6H9M61t6Asmp8B8FpRi/AAhs2FhLatw1iM3Jz6lIREUNkrW0Cn3nQ==
 
 expo-constants@~16.0.0:
   version "16.0.2"
