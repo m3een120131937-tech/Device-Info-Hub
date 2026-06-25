@@ -1,24 +1,21 @@
 workflows:
   default-workflow:
-    name: Mainalasri Technician Pro Build
+    name: Mainalasri Technician Pro
     instance_type: mac_mini_m2
     max_build_duration: 120
     environment:
       node: 18.0.0
+      vars:
+        EXPO_TOKEN: $EXPO_TOKEN
     scripts:
       - name: Install dependencies
         script: |
           npm install
-          npm install -g eas-cli
-      - name: Configure EAS
+          npm install -g eas-cli expo-cli
+      - name: Login to Expo
         script: |
-          echo $EAS_JSON | base64 -d > eas.json
-      - name: Build APK
-        script: |
+          echo "EXPO_TOKEN=$EXPO_TOKEN" >> ~/.bashrc
+          source ~/.bashrc
           eas build --platform android --non-interactive
     artifacts:
       - build/**/*.apk
-    publishing:
-      email:
-        recipients:
-          - m3een120131937@gmail.com
