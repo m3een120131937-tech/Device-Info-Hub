@@ -1,30 +1,24 @@
 workflows:
   default-workflow:
-    name: Mainalasri Technician Pro
+    name: Mainalasri Technician Pro Build
     instance_type: mac_mini_m2
     max_build_duration: 120
     environment:
-      node: 18
-      xcode: latest
-      cocoapods: default
-    triggering:
-      events:
-        - push
-      branch:
-        - main
+      node: 18.0.0
     scripts:
       - name: Install dependencies
-        script: npm install
-      - name: Build Android
+        script: |
+          npm install
+          npm install -g eas-cli
+      - name: Configure EAS
+        script: |
+          echo $EAS_JSON | base64 -d > eas.json
+      - name: Build APK
         script: |
           eas build --platform android --non-interactive
     artifacts:
       - build/**/*.apk
-      - build/**/*.aab
     publishing:
       email:
         recipients:
           - m3een120131937@gmail.com
-        notify:
-          on_success: true
-          on_failure: true
